@@ -1,4 +1,5 @@
 import { createEvent, uploadImage } from '../api/fetchAPI.js'
+import Loader from '../components/Loader.js'
 
 const CreateEvent = () => {
   const container = document.createElement('div')
@@ -6,7 +7,6 @@ const CreateEvent = () => {
   container.innerHTML = `<h1>➕ Crear nuevo evento</h1>`
 
   const token = localStorage.getItem('token')
-
   if (!token) {
     container.innerHTML += `<p>⚠️ Debes iniciar sesión para crear eventos.</p>`
     return container
@@ -23,14 +23,23 @@ const CreateEvent = () => {
     <div id="create-message"></div>
   `
 
+  const msg = form.querySelector('#create-message')
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
 
-    const formData = new FormData(form)
-    const file = formData.get('banner')
+    const loader = Loader()
+    msg.innerHTML = ''
+    msg.appendChild(loader)
 
-    // ☁️ Subimos la imagen a Cloudinary
-    const imageUrl = await uploadImage(file)
+    const formData = new FormData(form)
+    const imageUrl = await uploadImage(formData.get('banner'))
+
+    if (!imageUrl) {
+      loader.remove()
+      msg.textContent = '❌ Error al subir la imagen.'
+      return
+    }
 
     const data = {
       title: formData.get('title'),
@@ -41,8 +50,8 @@ const CreateEvent = () => {
     }
 
     const res = await createEvent(data, token)
+    loader.remove()
 
-    const msg = form.querySelector('#create-message')
     msg.textContent = res.message || '✅ Evento creado correctamente'
 
     if (res._id) {

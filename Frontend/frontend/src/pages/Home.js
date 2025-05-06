@@ -1,15 +1,19 @@
 import { getEvents, attendEvent } from '../api/fetchAPI.js'
+import Loader from '../components/Loader.js'
 
 const Home = () => {
   const container = document.createElement('div')
-  container.classList.add('page-container')
   container.innerHTML = `<h1>🏠 Página de inicio</h1>`
 
   const user = JSON.parse(localStorage.getItem('user'))
   const token = localStorage.getItem('token')
 
+  const loader = Loader()
+  container.appendChild(loader)
+
   const loadEvents = async () => {
     const events = await getEvents()
+    container.removeChild(loader)
 
     if (events.length === 0) {
       container.innerHTML += `<p>No hay eventos disponibles.</p>`

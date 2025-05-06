@@ -1,4 +1,5 @@
 import { getEvents, cancelAttendance } from '../api/fetchAPI.js'
+import Loader from '../components/Loader.js'
 
 const Favourites = () => {
   const container = document.createElement('div')
@@ -14,7 +15,11 @@ const Favourites = () => {
   }
 
   const loadFavourites = async () => {
+    const loader = Loader()
+    container.appendChild(loader)
+
     const events = await getEvents()
+    container.removeChild(loader)
 
     const favourites = events.filter((event) =>
       event.attendees.some((att) => att._id === user.id)
@@ -48,7 +53,6 @@ const Favourites = () => {
       const button = document.createElement('button')
       button.classList.add('cancel-btn')
       button.textContent = '❌ No asistir'
-      button.style.marginTop = '0.5rem'
 
       button.addEventListener('click', async () => {
         const res = await cancelAttendance(event._id, token)

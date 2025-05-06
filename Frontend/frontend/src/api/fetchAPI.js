@@ -1,20 +1,13 @@
 // 🔐 Registro o login automático
-export const loginOrRegister = async (data) => {
+export const loginOrRegister = async (data, isRegister = false) => {
+  const endpoint = isRegister ? 'register' : 'login'
+
   try {
-    const res = await fetch('http://localhost:5000/api/auth/register', {
+    const res = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
-
-    if (res.status === 400) {
-      const loginRes = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      return await loginRes.json()
-    }
 
     return await res.json()
   } catch (err) {
